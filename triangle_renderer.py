@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import math
 
 def create_coordinates(width=1000,height=1000,left_bound=-2,right_bound=2,lower_bound=-2,upper_bound=2,render_depth=100):
     pixel_coordinates=np.stack((np.meshgrid(np.arange(left_bound,right_bound,(right_bound-left_bound)/width),np.arange(upper_bound,lower_bound,(lower_bound-upper_bound)/height))),axis=-1)
@@ -58,18 +59,27 @@ def show_screen(screen,delay=0):
     cv2.imshow('Two triangles',screen[:,:,:3].astype(np.uint8))
     cv2.waitKey(delay)
 
+def rotate_triangles(triangles,a,b):
+    rotated_triangles=np.stack((triangles[:,:,0]*math.cos(a)-triangles[:,:,1]*math.sin(a),triangles[:,:,0]*math.sin(a)*math.cos(b)+triangles[:,:,1]*math.cos(a)*math.cos(b)-triangles[:,:,2]*math.sin(b),triangles[:,:,0]*math.sin(a)*math.sin(b)+triangles[:,:,1]*math.cos(a)*math.sin(b)+triangles[:,:,2]*math.cos(b)),axis=-1)
+    rotated_triangles=np.stack((rotated_triangles[:,0],rotated_triangles[:,1],rotated_triangles[:,2],triangles[:,3]),axis=1)
+    return rotated_triangles
+
 def main():
-    screen,x_values,y_values=create_coordinates()
+    base_screen,x_values,y_values=create_coordinates()
 
     # triangles contains the points of two triangles along with their colors
     triangles=np.array([[[-1,-.1,-1],[1,-.1,-1],[0,1,1],[255,0,0]],[[-1,.1,-1],[1,.1,-1],[0,-1,1],[0,0,255]]])
 
-    for triangle in triangles:
-        plot_triangle(triangle,screen,x_values,y_values)
-
-    show_screen(screen)
+    second_angle=math.pi/6
+    for angle in np.arange(0,2*math.pi,.1):
+        screen=np.copy(base_screen)
+        rotated_triangles=rotate_triangles(triangles,angle,second_angle)
+        for triangle in rotated_triangles:
+            plot_triangle(triangle,screen,x_values,y_values)
+        show_screen(screen,1)
 
     # display screen to our screen
+    show_screen(screen)
     cv2.destroyAllWindows()
 
 if __name__=="__main__":
