@@ -64,6 +64,24 @@ def rotate_triangles(triangles,a,b):
     rotated_triangles=np.stack((rotated_triangles[:,0],rotated_triangles[:,1],rotated_triangles[:,2],triangles[:,3]),axis=1)
     return rotated_triangles
 
+def rotate_triangle(triangle,a,b):
+    cos=math.cos(a)
+    sin=math.sin(a)
+    rotation_matrix_1=np.stack([[cos,-sin,0],[sin,cos,0],[0,0,1]])
+    cos=math.cos(b)
+    sin=math.sin(b)
+    rotation_matrix_2=np.stack([[1,0,0],[0,cos,-sin],[0,sin,cos]])
+
+    color=triangle[3]
+
+    xyz=np.array([triangle[:3,0],triangle[:3,1],triangle[:3,2]])
+    rotated_triangles=np.dot(rotation_matrix_2,np.dot(rotation_matrix_1,xyz))
+    rotated_triangles=np.stack((rotated_triangles[:,0],rotated_triangles[:,1],rotated_triangles[:,2],color),axis=1)
+
+    print(rotated_triangles)
+
+    return rotated_triangles
+
 def main():
     base_screen,x_values,y_values=create_coordinates()
 
@@ -73,7 +91,8 @@ def main():
     second_angle=math.pi/6
     for angle in np.arange(0,2*math.pi,.1):
         screen=np.copy(base_screen)
-        rotated_triangles=rotate_triangles(triangles,angle,second_angle)
+        #rotated_triangles=rotate_triangles(triangles,angle,second_angle)
+        rotated_triangles=np.array([rotate_triangle(triangle,angle,second_angle) for triangle in triangles])
         for triangle in rotated_triangles:
             plot_triangle(triangle,screen,x_values,y_values)
         show_screen(screen,1)
