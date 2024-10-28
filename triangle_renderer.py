@@ -75,12 +75,10 @@ def rotate_triangle(triangle,a,b):
     color=triangle[3]
 
     xyz=np.array([triangle[:3,0],triangle[:3,1],triangle[:3,2]])
-    rotated_triangles=np.dot(rotation_matrix_2,np.dot(rotation_matrix_1,xyz))
-    rotated_triangles=np.stack((rotated_triangles[:,0],rotated_triangles[:,1],rotated_triangles[:,2],color),axis=1)
+    rotated_triangle=np.dot(rotation_matrix_2,np.dot(rotation_matrix_1,xyz))
+    rotated_triangle=np.stack((rotated_triangle[:,0],rotated_triangle[:,1],rotated_triangle[:,2],color),axis=0)
 
-    print(rotated_triangles)
-
-    return rotated_triangles
+    return rotated_triangle
 
 def main():
     base_screen,x_values,y_values=create_coordinates()
